@@ -5,7 +5,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Initialize Rust project using `cargo init` in the repository root and add primary dependencies (tokio, serde, thiserror, anyhow, url, toml, tracing, tracing-appender) to `Cargo.toml`.
+- [ ] T001 Add primary dependencies (tokio, serde, thiserror, anyhow, url, toml, tracing, tracing-appender) to `Cargo.toml`.
 - [ ] T002 Create modular directory structure in `src/` (`core/`, `os/`, `cli/`, `extension/`) as defined in the plan.
 - [ ] T003 Create `src/main.rs` and `src/cli/mod.rs` to set up basic `clap` CLI structure with commands (`daemon`, `install`).
 - [ ] T004 Create foundational browser extension directory structure (`extension/` with `manifest.json`, `background.js`, `content.js`).
