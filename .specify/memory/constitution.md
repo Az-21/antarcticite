@@ -1,50 +1,56 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- 
+Sync Impact Report:
+- Version change: N/A -> 1.0.0
+- List of modified principles:
+  - Added: I. Clean & Readable Rust
+  - Added: II. Meaningful Documentation
+  - Added: III. Modular & Bounded Files
+  - Added: IV. Strict Quality & Testing Gates (NON-NEGOTIABLE)
+  - Added: V. Ecosystem Integration
+- Added sections: 
+  - Technology Standards
+  - Development Workflow
+- Removed sections: N/A
+- Templates requiring updates:
+  - .specify/templates/plan-template.md (✅ updated)
+  - .specify/templates/spec-template.md (✅ updated)
+  - .specify/templates/tasks-template.md (✅ updated)
+- Follow-up TODOs: None
+-->
+# antarcticite Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Clean & Readable Rust
+Write clean, readable Rust. Prioritise clarity over cleverness — if a simpler approach is 0.1% slower, use the simpler approach. Prefer concrete implementations over premature abstractions.
+*Rationale: Simpler code is easier to maintain and review. Premature abstraction leads to unnecessary complexity.*
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Meaningful Documentation
+Document the intent of functions (why they exist, what decisions they make, what the invariants are), not a paraphrase of their name.
+*Rationale: Comments that duplicate the code name are useless. Intent and invariants provide context that the code alone cannot.*
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Modular & Bounded Files
+Keep files under 200 lines and separate concerns into distinct module folders. A catch-all `utils.rs` file MUST NOT be used.
+*Rationale: Bounded file sizes and explicit modules ensure code remains navigable and focused on a single responsibility.*
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Strict Quality & Testing Gates (NON-NEGOTIABLE)
+After every change, run `cargo fmt`, `cargo clippy`, `cargo check`, `cargo build`, and `cargo test` in order, and fix all issues before moving on. Write unit tests for every piece of logic, with test names and comments that describe the behaviour being guarded against regression. Never use `.unwrap()` outside of tests.
+*Rationale: Automated checks catch regressions early and enforce formatting consistency. Eliminating unwrap guarantees the software won't crash from unhandled Option/Result.*
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Ecosystem Integration
+Use well-established crates from the ecosystem rather than reinventing the wheel — reach for tokio, serde, thiserror, anyhow, reqwest, axum, clap, and similar battle-tested libraries where they fit. Always use the latest stable version of any dependency.
+*Rationale: Leveraging community-tested crates reduces maintenance burden and increases reliability and security.*
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Technology Standards
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+All development MUST use Rust. Dependencies MUST be restricted to well-known, battle-tested crates to ensure stability and maintainability.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Every change MUST pass the strict quality gates defined in Principle IV. Code MUST be consistently formatted, linted without warnings, and fully tested.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Amendments to this constitution require a version bump according to semantic versioning rules. All pull requests and code reviews MUST verify compliance with the core principles, especially the strict quality gates and modularity constraints.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-03-20 | **Last Amended**: 2026-03-20

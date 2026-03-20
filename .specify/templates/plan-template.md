@@ -17,11 +17,11 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Language/Version**: Rust (latest stable)
+**Primary Dependencies**: [tokio, serde, thiserror, anyhow, reqwest, axum, clap - select as needed]
+**Storage**: [if applicable, e.g., PostgreSQL, SQLite, files or N/A]
+**Testing**: cargo test (fmt, clippy, check, build, test sequence required)
+**Target Platform**: [e.g., Linux server, WASM, CLI or NEEDS CLARIFICATION]
 **Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]  
 **Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
 **Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
@@ -31,7 +31,11 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] Does the plan prioritize clarity and readable Rust over cleverness?
+- [ ] Are files planned to be under 200 lines and modular without catch-all utils?
+- [ ] Are unit tests with descriptive names/comments planned for every piece of logic?
+- [ ] Does the plan leverage well-established crates instead of reinventing?
+- [ ] Are `unwrap()` usages strictly limited to tests?
 
 ## Project Structure
 

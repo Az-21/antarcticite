@@ -90,6 +90,11 @@
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
 
+### Non-Functional Requirements (Constitution Compliance)
+- **NFR-001**: System MUST be strictly tested with 0 unwrap statements outside tests.
+- **NFR-002**: All logic pieces MUST include behavior-describing comments and tests.
+- **NFR-003**: Files MUST not exceed 200 lines and use explicit module separations.
+
 *Example of marking unclear requirements:*
 
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
