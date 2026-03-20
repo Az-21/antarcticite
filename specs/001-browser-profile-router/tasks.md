@@ -5,10 +5,10 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Add primary dependencies (tokio, serde, thiserror, anyhow, url, toml, tracing, tracing-appender) to `Cargo.toml`.
-- [ ] T002 Create modular directory structure in `src/` (`core/`, `os/`, `cli/`, `extension/`) as defined in the plan.
-- [ ] T003 Create `src/main.rs` and `src/cli/mod.rs` to set up basic `clap` CLI structure with commands (`daemon`, `install`).
-- [ ] T004 Create foundational browser extension directory structure (`extension/` with `manifest.json`, `background.js`, `content.js`).
+- [x] T001 Add primary dependencies (tokio, serde, thiserror, anyhow, url, toml, tracing, tracing-appender) to `Cargo.toml`.
+- [x] T002 Create modular directory structure in `src/` (`core/`, `os/`, `cli/`, `extension/`) as defined in the plan.
+- [x] T003 Create `src/main.rs` and `src/cli/mod.rs` to set up basic `clap` CLI structure with commands (`daemon`, `install`).
+- [x] T004 Create foundational browser extension directory structure (`extension/` with `manifest.json`, `background.js`, `content.js`).
 
 ## Phase 2: Foundational 
 
