@@ -17,7 +17,8 @@ pub enum RouteResult<'a> {
     PendingRedirect,
 }
 
-static DEBOUNCE_CACHE: Lazy<Mutex<HashMap<String, Instant>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+static DEBOUNCE_CACHE: Lazy<Mutex<HashMap<String, Instant>>> =
+    Lazy::new(|| Mutex::new(HashMap::new()));
 const DEBOUNCE_DURATION: Duration = Duration::from_millis(500);
 
 // Simple global tracking to prevent infinite redirect loops
@@ -33,22 +34,25 @@ pub fn route_url<'a>(url_str: &str, config: &'a Config) -> Result<RouteResult<'a
     for policy in &config.redirect_policies {
         if domain == policy.match_domain {
             info!("Matched redirect policy for domain: {}", domain);
-            
+
             // Check redirect depth to prevent infinite loops
             let mut depth_map = REDIRECT_DEPTH.lock().unwrap();
             let depth = depth_map.entry(domain.to_string()).or_insert(0);
             *depth += 1;
-            
+
             if *depth > MAX_REDIRECT_DEPTH {
-                let msg = format!("Exceeded maximum redirect depth ({}) for domain {}", MAX_REDIRECT_DEPTH, domain);
+                let msg = format!(
+                    "Exceeded maximum redirect depth ({}) for domain {}",
+                    MAX_REDIRECT_DEPTH, domain
+                );
                 error!("{}", msg);
                 show_notification("Infinite Redirect Detected", &msg);
-                
+
                 // Reset depth and fallback to default rather than looping forever
                 *depth = 0;
                 return Ok(RouteResult::Fallback(&config.default));
             }
-            
+
             return Ok(RouteResult::PendingRedirect);
         }
     }
@@ -91,12 +95,12 @@ pub fn route_url<'a>(url_str: &str, config: &'a Config) -> Result<RouteResult<'a
 fn get_browser_command(browser: &str, profile: Option<&str>, url: &str) -> Command {
     // Basic normalization
     let browser_lower = browser.to_lowercase();
-    
+
     // We determine the actual executable and profile flag based on OS and browser type
     #[cfg(target_os = "macos")]
     {
         let mut cmd = Command::new("open");
-        
+
         // Translate some common application IDs or names for macOS
         let app_name = match browser_lower.as_str() {
             "chrome" | "com.google.chrome" | "google chrome" => "Google Chrome",
@@ -188,7 +192,7 @@ pub fn open_url(url_str: &str, config: &Config) -> Result<()> {
     {
         let mut cache = DEBOUNCE_CACHE.lock().unwrap();
         let now = Instant::now();
-        
+
         // Clean up old entries
         cache.retain(|_, time| now.duration_since(*time) < DEBOUNCE_DURATION);
 
@@ -198,7 +202,7 @@ pub fn open_url(url_str: &str, config: &Config) -> Result<()> {
                 return Ok(()); // Silently ignore duplicate clicks within 500ms
             }
         }
-        
+
         cache.insert(url_str.to_string(), now);
     }
 
@@ -207,23 +211,31 @@ pub fn open_url(url_str: &str, config: &Config) -> Result<()> {
 
     let (browser, profile) = match route_res {
         RouteResult::Matched(rule) => {
-            info!("Matched rule mapping to browser '{}', profile '{:?}'", rule.target_browser, rule.target_profile);
+            info!(
+                "Matched rule mapping to browser '{}', profile '{:?}'",
+                rule.target_browser, rule.target_profile
+            );
             (rule.target_browser.as_str(), rule.target_profile.as_deref())
         }
         RouteResult::PendingRedirect => {
-            info!("URL requires resolution. Opening in default browser WITHOUT profile flags so extension can intercept.");
+            info!(
+                "URL requires resolution. Opening in default browser WITHOUT profile flags so extension can intercept."
+            );
             (config.default.browser.as_str(), None) // Force no profile for the redirect wrapper
         }
         RouteResult::Fallback(fallback) => {
-            info!("Fell back to default browser '{}', profile '{:?}'", fallback.browser, fallback.profile);
+            info!(
+                "Fell back to default browser '{}', profile '{:?}'",
+                fallback.browser, fallback.profile
+            );
             (fallback.browser.as_str(), fallback.profile.as_deref())
         }
     };
 
     let mut cmd = get_browser_command(browser, profile, url_str);
-    
+
     debug!("Executing browser command: {:?}", cmd);
-    
+
     // Spawn disowns the process, which is exactly what we want for launching a browser
     match cmd.spawn() {
         Ok(_) => {

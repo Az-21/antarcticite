@@ -64,9 +64,12 @@ pub fn get_backup_config_path() -> Option<PathBuf> {
 
 pub fn load_config() -> Result<Config> {
     let config_path = get_config_path().context("Could not determine config directory")?;
-    
+
     if !config_path.exists() {
-        return Err(anyhow::anyhow!("Configuration file not found at {:?}", config_path));
+        return Err(anyhow::anyhow!(
+            "Configuration file not found at {:?}",
+            config_path
+        ));
     }
 
     let config_content = match fs::read_to_string(&config_path) {
@@ -84,7 +87,10 @@ pub fn load_config() -> Result<Config> {
             // Validate rules
             let invalid_rules: Vec<_> = config.rules.iter().filter(|r| !r.is_valid()).collect();
             if !invalid_rules.is_empty() {
-                warn!("Found {} invalid rules in configuration. Rules must have either match_domain or match_pattern.", invalid_rules.len());
+                warn!(
+                    "Found {} invalid rules in configuration. Rules must have either match_domain or match_pattern.",
+                    invalid_rules.len()
+                );
             }
 
             // Save to memory cache
@@ -107,7 +113,10 @@ pub fn load_config() -> Result<Config> {
         Err(e) => {
             let msg = format!("Failed to parse config.toml: {}", e);
             error!("{}", msg);
-            show_notification("Config Parsing Error", "Invalid config file format. Using fallback.");
+            show_notification(
+                "Config Parsing Error",
+                "Invalid config file format. Using fallback.",
+            );
             fallback_to_last_good()
         }
     }
@@ -138,7 +147,9 @@ fn fallback_to_last_good() -> Result<Config> {
         }
     }
 
-    Err(anyhow::anyhow!("No valid configuration available, and no fallback found."))
+    Err(anyhow::anyhow!(
+        "No valid configuration available, and no fallback found."
+    ))
 }
 
 #[cfg(test)]
@@ -169,12 +180,18 @@ timeout_seconds = 5
         let config: Config = toml::from_str(toml_str).expect("Failed to parse valid config");
         assert_eq!(config.default.browser, "com.google.chrome");
         assert_eq!(config.default.profile, Some("Default".to_string()));
-        
+
         assert_eq!(config.rules.len(), 2);
-        assert_eq!(config.rules[0].match_domain, Some("www.clientX.com".to_string()));
-        assert_eq!(config.rules[1].match_pattern, Some(".*\\.clientY\\.com".to_string()));
+        assert_eq!(
+            config.rules[0].match_domain,
+            Some("www.clientX.com".to_string())
+        );
+        assert_eq!(
+            config.rules[1].match_pattern,
+            Some(".*\\.clientY\\.com".to_string())
+        );
         assert!(config.rules[0].is_valid());
-        
+
         assert_eq!(config.redirect_policies.len(), 1);
         assert_eq!(config.redirect_policies[0].timeout_seconds, 5);
     }

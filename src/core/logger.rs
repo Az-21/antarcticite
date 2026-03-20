@@ -7,9 +7,9 @@ pub fn init() -> anyhow::Result<tracing_appender::non_blocking::WorkerGuard> {
     // Determine the log directory
     let proj_dirs = ProjectDirs::from("com", "antarcticite", "router")
         .ok_or_else(|| anyhow::anyhow!("Could not determine project directories"))?;
-    
+
     let log_dir = proj_dirs.data_local_dir().join("logs");
-    
+
     // Create the log directory if it doesn't exist
     std::fs::create_dir_all(&log_dir)?;
 

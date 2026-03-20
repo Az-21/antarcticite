@@ -1,8 +1,8 @@
 use anyhow::Result;
 use tracing::info;
 use tray_icon::{
+    Icon, TrayIcon, TrayIconBuilder,
     menu::{Menu, MenuItem, PredefinedMenuItem},
-    TrayIconBuilder, TrayIcon, Icon,
 };
 
 pub struct TrayApp {
@@ -21,10 +21,10 @@ impl TrayApp {
         let icon = Icon::from_rgba(rgba, width, height)?;
 
         let tray_menu = Menu::new();
-        
+
         let config_item = MenuItem::new("Open Configuration", true, None);
         let quit_item = MenuItem::new("Quit", true, None);
-        
+
         let _ = tray_menu.append(&config_item);
         let _ = tray_menu.append(&PredefinedMenuItem::separator());
         let _ = tray_menu.append(&quit_item);
@@ -42,7 +42,7 @@ impl TrayApp {
         std::thread::spawn(move || {
             let menu_channel = tray_icon::menu::MenuEvent::receiver();
             let _tray_channel = tray_icon::TrayIconEvent::receiver();
-            
+
             loop {
                 if let Ok(event) = menu_channel.recv() {
                     if event.id == config_item_id {

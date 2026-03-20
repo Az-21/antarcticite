@@ -47,10 +47,11 @@ MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme
         exe_path.display()
     );
 
-    let base_dirs = BaseDirs::new().ok_or_else(|| anyhow::anyhow!("Could not find base directories"))?;
+    let base_dirs =
+        BaseDirs::new().ok_or_else(|| anyhow::anyhow!("Could not find base directories"))?;
     let applications_dir = base_dirs.data_local_dir().join("applications");
     fs::create_dir_all(&applications_dir)?;
-    
+
     let desktop_file = applications_dir.join("antarcticite.desktop");
     fs::write(&desktop_file, desktop_entry)?;
     info!("Created desktop entry at {:?}", desktop_file);
@@ -64,7 +65,9 @@ MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme
             info!("Successfully registered as the default web browser via xdg-settings.");
         }
         _ => {
-            warn!("Failed to set default browser automatically using xdg-settings. Please do it manually.");
+            warn!(
+                "Failed to set default browser automatically using xdg-settings. Please do it manually."
+            );
         }
     }
 
@@ -73,7 +76,9 @@ MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme
 
 #[cfg(target_os = "macos")]
 fn install_macos() -> Result<()> {
-    info!("On macOS, automatic default browser registration requires specific APIs or user interaction.");
+    info!(
+        "On macOS, automatic default browser registration requires specific APIs or user interaction."
+    );
     info!("To register Antarcticite as your default browser:");
     info!("1. Ensure the app is bundled as an .app (e.g. using cargo-bundle).");
     info!("2. Open System Settings -> Desktop & Dock -> Default web browser.");
@@ -89,25 +94,39 @@ fn install_windows() -> Result<()> {
 
     let prog_id = "AntarcticiteURL";
     let app_name = "Antarcticite Router";
-    
+
     let commands = vec![
         // Register ProgID
-        format!("reg add \"HKCU\\Software\\Classes\\{}\" /ve /t REG_SZ /d \"{} HTML Document\" /f", prog_id, app_name),
-        format!("reg add \"HKCU\\Software\\Classes\\{}\\shell\\open\\command\" /ve /t REG_SZ /d \"\\\"{}\\\" \\\"%1\\\"\" /f", prog_id, exe_str),
-        
+        format!(
+            "reg add \"HKCU\\Software\\Classes\\{}\" /ve /t REG_SZ /d \"{} HTML Document\" /f",
+            prog_id, app_name
+        ),
+        format!(
+            "reg add \"HKCU\\Software\\Classes\\{}\\shell\\open\\command\" /ve /t REG_SZ /d \"\\\"{}\\\" \\\"%1\\\"\" /f",
+            prog_id, exe_str
+        ),
         // Register Application
-        format!("reg add \"HKCU\\Software\\Clients\\StartMenuInternet\\{}\" /ve /t REG_SZ /d \"{}\" /f", app_name, app_name),
-        format!("reg add \"HKCU\\Software\\Clients\\StartMenuInternet\\{}\\Capabilities\\URLAssociations\" /v \"http\" /t REG_SZ /d \"{}\" /f", app_name, prog_id),
-        format!("reg add \"HKCU\\Software\\Clients\\StartMenuInternet\\{}\\Capabilities\\URLAssociations\" /v \"https\" /t REG_SZ /d \"{}\" /f", app_name, prog_id),
-        
+        format!(
+            "reg add \"HKCU\\Software\\Clients\\StartMenuInternet\\{}\" /ve /t REG_SZ /d \"{}\" /f",
+            app_name, app_name
+        ),
+        format!(
+            "reg add \"HKCU\\Software\\Clients\\StartMenuInternet\\{}\\Capabilities\\URLAssociations\" /v \"http\" /t REG_SZ /d \"{}\" /f",
+            app_name, prog_id
+        ),
+        format!(
+            "reg add \"HKCU\\Software\\Clients\\StartMenuInternet\\{}\\Capabilities\\URLAssociations\" /v \"https\" /t REG_SZ /d \"{}\" /f",
+            app_name, prog_id
+        ),
         // Register in RegisteredApplications
-        format!("reg add \"HKCU\\Software\\RegisteredApplications\" /v \"{}\" /t REG_SZ /d \"Software\\Clients\\StartMenuInternet\\{}\\Capabilities\" /f", app_name, app_name),
+        format!(
+            "reg add \"HKCU\\Software\\RegisteredApplications\" /v \"{}\" /t REG_SZ /d \"Software\\Clients\\StartMenuInternet\\{}\\Capabilities\" /f",
+            app_name, app_name
+        ),
     ];
 
     for cmd_str in commands {
-        let status = Command::new("cmd")
-            .args(["/C", &cmd_str])
-            .status();
+        let status = Command::new("cmd").args(["/C", &cmd_str]).status();
         if let Err(e) = status {
             warn!("Failed to execute registry command: {} - {}", cmd_str, e);
         }

@@ -5,7 +5,9 @@ pub mod os;
 
 use clap::Parser;
 use cli::{Cli, Commands};
-use extension::native_messaging::{read_message, write_message, ExtensionMessage, NativeMessage, AckData};
+use extension::native_messaging::{
+    AckData, ExtensionMessage, NativeMessage, read_message, write_message,
+};
 use tracing::{error, info};
 
 #[tokio::main]
@@ -25,7 +27,7 @@ async fn main() -> anyhow::Result<()> {
     match &cli.command {
         Some(Commands::Daemon) => {
             info!("Starting daemon/native messaging host...");
-            
+
             // Initialize system tray
             let _tray_app = match os::tray::TrayApp::new() {
                 Ok(app) => Some(app),
@@ -34,13 +36,16 @@ async fn main() -> anyhow::Result<()> {
                     None
                 }
             };
-            
+
             // Loop reading from stdin
             loop {
                 match read_message() {
                     Ok(Some(ExtensionMessage::ResolvedUrl(data))) => {
-                        info!("Received resolved URL from extension: {}", data.resolved_url);
-                        
+                        info!(
+                            "Received resolved URL from extension: {}",
+                            data.resolved_url
+                        );
+
                         // Load config and route the resolved URL
                         let config = match core::config::load_config() {
                             Ok(c) => c,
@@ -49,7 +54,7 @@ async fn main() -> anyhow::Result<()> {
                                 continue;
                             }
                         };
-                        
+
                         if let Err(e) = core::router::open_url(&data.resolved_url, &config) {
                             error!("Failed to route resolved URL: {}", e);
                         } else {
@@ -89,7 +94,7 @@ async fn main() -> anyhow::Result<()> {
                         return Err(e);
                     }
                 };
-                
+
                 if let Err(e) = core::router::open_url(url, &config) {
                     error!("Failed to route URL: {}", e);
                     eprintln!("Failed to route URL: {}", e);

@@ -38,7 +38,7 @@ pub struct ErrorData {
 /// Reads a native messaging payload from standard input.
 pub fn read_message() -> Result<Option<ExtensionMessage>> {
     let mut stdin = io::stdin();
-    
+
     // Read the 32-bit length prefix
     let length = match stdin.read_u32::<NativeEndian>() {
         Ok(len) => len as usize,
@@ -55,7 +55,9 @@ pub fn read_message() -> Result<Option<ExtensionMessage>> {
 
     // Read the JSON payload
     let mut buffer = vec![0; length];
-    stdin.read_exact(&mut buffer).context("Failed to read message payload")?;
+    stdin
+        .read_exact(&mut buffer)
+        .context("Failed to read message payload")?;
 
     let json_str = String::from_utf8(buffer).context("Payload is not valid UTF-8")?;
     let message: ExtensionMessage = serde_json::from_str(&json_str)
@@ -68,14 +70,18 @@ pub fn read_message() -> Result<Option<ExtensionMessage>> {
 pub fn write_message(message: &NativeMessage) -> Result<()> {
     let json_str = serde_json::to_string(message).context("Failed to serialize message")?;
     let buffer = json_str.as_bytes();
-    
+
     let mut stdout = io::stdout();
-    
+
     // Write the 32-bit length prefix
-    stdout.write_u32::<NativeEndian>(buffer.len() as u32).context("Failed to write length prefix")?;
-    
+    stdout
+        .write_u32::<NativeEndian>(buffer.len() as u32)
+        .context("Failed to write length prefix")?;
+
     // Write the JSON payload
-    stdout.write_all(buffer).context("Failed to write payload")?;
+    stdout
+        .write_all(buffer)
+        .context("Failed to write payload")?;
     stdout.flush().context("Failed to flush stdout")?;
 
     Ok(())
@@ -91,7 +97,7 @@ mod tests {
             status: "success".to_string(),
             message: "URL routed to profile A".to_string(),
         });
-        
+
         let json = serde_json::to_string(&msg).unwrap();
         assert_eq!(
             json,
