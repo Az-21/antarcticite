@@ -26,6 +26,15 @@ async fn main() -> anyhow::Result<()> {
         Some(Commands::Daemon) => {
             info!("Starting daemon/native messaging host...");
             
+            // Initialize system tray
+            let _tray_app = match os::tray::TrayApp::new() {
+                Ok(app) => Some(app),
+                Err(e) => {
+                    error!("Failed to initialize tray icon: {}", e);
+                    None
+                }
+            };
+            
             // Loop reading from stdin
             loop {
                 match read_message() {

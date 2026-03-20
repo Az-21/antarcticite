@@ -63,10 +63,10 @@
 
 ## Phase 6: Polish
 
-- [ ] T026 Add `tray-icon` dependency and implement `src/os/tray.rs` to show a system tray icon when running in daemon mode, with a menu to open the config file or quit.
-- [ ] T027 Connect the system tray loop alongside the main Native Messaging / daemon loop in `src/main.rs`.
-- [ ] T028 Perform full end-to-end integration testing across macOS, Linux, and Windows (or primary development OS first).
-- [ ] T029 Add comprehensive README and installation instructions covering the native app, the extension, and Native Messaging manifest installation.
+- [x] T026 Add `tray-icon` dependency and implement `src/os/tray.rs` to show a system tray icon when running in daemon mode, with a menu to open the config file or quit.
+- [x] T027 Connect the system tray loop alongside the main Native Messaging / daemon loop in `src/main.rs`.
+- [x] T028 Perform full end-to-end integration testing across macOS, Linux, and Windows (or primary development OS first).
+- [x] T029 Add comprehensive README and installation instructions covering the native app, the extension, and Native Messaging manifest installation.
 
 ## Dependencies & Execution Order
 

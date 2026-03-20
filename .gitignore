@@ -25,3 +25,8 @@ release/
 Thumbs.db
 *.tmp
 *.swp
+
+# Node.js/JavaScript
+node_modules/
+dist/
+build/
