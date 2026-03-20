@@ -1,7 +1,11 @@
 use crate::core::config::{Config, DefaultFallback, Rule};
 use anyhow::{Context, Result};
+use once_cell::sync::Lazy;
 use regex::Regex;
+use std::collections::HashMap;
 use std::process::Command;
+use std::sync::Mutex;
+use std::time::{Duration, Instant};
 use tracing::{debug, error, info, warn};
 use url::Url;
 
@@ -9,6 +13,9 @@ pub enum RouteResult<'a> {
     Matched(&'a Rule),
     Fallback(&'a DefaultFallback),
 }
+
+static DEBOUNCE_CACHE: Lazy<Mutex<HashMap<String, Instant>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+const DEBOUNCE_DURATION: Duration = Duration::from_millis(500);
 
 /// Routes a URL string against a configuration, returning the matching rule or the default fallback.
 pub fn route_url<'a>(url_str: &str, config: &'a Config) -> Result<RouteResult<'a>> {
@@ -141,6 +148,23 @@ fn get_browser_command(browser: &str, profile: Option<&str>, url: &str) -> Comma
 }
 
 pub fn open_url(url_str: &str, config: &Config) -> Result<()> {
+    {
+        let mut cache = DEBOUNCE_CACHE.lock().unwrap();
+        let now = Instant::now();
+        
+        // Clean up old entries
+        cache.retain(|_, time| now.duration_since(*time) < DEBOUNCE_DURATION);
+
+        if let Some(&last_time) = cache.get(url_str) {
+            if now.duration_since(last_time) < DEBOUNCE_DURATION {
+                info!("Debounced duplicate request for URL: {}", url_str);
+                return Ok(()); // Silently ignore duplicate clicks within 500ms
+            }
+        }
+        
+        cache.insert(url_str.to_string(), now);
+    }
+
     info!("Routing request for URL: {}", url_str);
     let route_res = route_url(url_str, config)?;
 

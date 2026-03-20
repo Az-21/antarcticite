@@ -41,9 +41,9 @@
 **Goal**: As a user, I want URLs that don't match any specific client rules to open in my default browser and profile, so my regular browsing is unaffected.
 **Independent Test**: Click a link that has no matching rule and verify it opens in the default configured browser.
 
-- [ ] T017 [US2] Update `src/core/router.rs` to cleanly fall back to the `DefaultFallback` configuration if no rules match.
-- [ ] T018 [P] [US2] Write unit tests for the fallback routing logic in `src/core/router.rs`.
-- [ ] T019 [US2] Implement a debounce mechanism in `src/core/router.rs` (or `main.rs`) to prevent rapid, consecutive clicks on the same link from launching multiple browser instances within 500ms.
+- [x] T017 [US2] Update `src/core/router.rs` to cleanly fall back to the `DefaultFallback` configuration if no rules match.
+- [x] T018 [P] [US2] Write unit tests for the fallback routing logic in `src/core/router.rs`.
+- [x] T019 [US2] Implement a debounce mechanism in `src/core/router.rs` (or `main.rs`) to prevent rapid, consecutive clicks on the same link from launching multiple browser instances within 500ms.
 
 ## Phase 5: User Story 3 - Mimecast / Redirect Resolution
 
