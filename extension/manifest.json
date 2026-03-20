@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Antarcticite Router Companion",
+  "version": "1.0",
+  "description": "Companion extension for Antarcticite Browser Profile Router to handle redirects.",
+  "permissions": [
+    "webNavigation",
+    "nativeMessaging",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

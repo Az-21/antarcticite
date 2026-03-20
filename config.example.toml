@@ -1,0 +1,60 @@
+# -----------------------------------------------------------------------------
+# Default Fallback
+# -----------------------------------------------------------------------------
+# Used when no rules match the clicked URL.
+[default]
+# Example: Windows Chrome
+browser = "chrome.exe"
+profile = "Default"
+
+# -----------------------------------------------------------------------------
+# Routing Rules
+# -----------------------------------------------------------------------------
+# Rules are evaluated in the order they appear.
+
+# Example: Exact domain match (macOS Chrome)
+[[rules]]
+match_domain = "github.com"
+target_browser = "com.google.chrome"
+target_profile = "Profile 1"
+
+# Example: Regex pattern matching any subdomain (Linux Firefox)
+[[rules]]
+match_pattern = ".*\\.internal\\.company\\.com"
+target_browser = "firefox"
+# Firefox profiles are often referenced by their exact directory name 
+target_profile = "dev-edition"
+
+# Example: Exact match (Windows Edge)
+[[rules]]
+match_domain = "outlook.office.com"
+target_browser = "msedge.exe"
+target_profile = "Profile 2"
+
+# Example: Regex for multiple TLDs (macOS Edge)
+[[rules]]
+match_pattern = "jira\\.mycompany\\.(com|org)"
+target_browser = "com.microsoft.edgemac"
+target_profile = "Profile 3"
+
+# Example: Catch-all regex for a specific environment (Linux Chrome)
+[[rules]]
+match_pattern = "^https?://staging-.*\\.myapp\\.net"
+target_browser = "google-chrome"
+target_profile = "Profile 4"
+
+# -----------------------------------------------------------------------------
+# Redirect Policies (e.g., Security Wrappers)
+# -----------------------------------------------------------------------------
+# Waits for a companion browser extension to resolve the final destination 
+# before routing rules are applied.
+
+# Wait for Mimecast to resolve
+[[redirect_policies]]
+match_domain = "protect-eu.mimecast.com"
+timeout_seconds = 5
+
+# Wait for Proofpoint to resolve
+[[redirect_policies]]
+match_domain = "urldefense.proofpoint.com"
+timeout_seconds = 5
