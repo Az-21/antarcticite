@@ -15,6 +15,9 @@
 - [ ] T005 Implement `src/core/logger.rs` to configure rolling plain-text logging using `tracing-appender` in the OS app data directory.
 - [ ] T006 Implement `src/core/config.rs` defining the `Config`, `Rule`, `DefaultFallback`, and `RedirectPolicy` structs matching `data-model.md` and implementing `serde` serialization.
 - [ ] T007 Implement function to load and parse the TOML configuration file from the standard OS configuration path in `src/core/config.rs`.
+- [ ] T007a [P] Write unit tests in `src/core/config.rs` for parsing valid and invalid TOML configurations to ensure robust deserialization.
+- [ ] T007b Implement caching mechanism in `src/core/config.rs` to store the last known good configuration in memory/disk and fallback to it (while triggering an OS notification via `src/os/notifications.rs`) if parsing the updated TOML file fails.
+
 - [ ] T008 Implement `src/os/notifications.rs` to wrap `notify-rust` for displaying errors (e.g., config parsing errors) natively.
 
 ## Phase 3: User Story 1 - Basic URL Routing
@@ -25,6 +28,8 @@
 - [ ] T009 [US1] Implement `src/core/router.rs` to accept a URL and a `Config` and return the matching `Rule` or `DefaultFallback`.
 - [ ] T010 [P] [US1] Write unit tests in `src/core/router.rs` for URL matching logic (exact domain match and regex/pattern match).
 - [ ] T011 [US1] Implement OS-specific browser launch logic (handling different browsers and profile flags) triggered by the router in `src/core/router.rs`.
+- [ ] T011a [P] [US1] Write unit tests in `src/core/router.rs` (or os module) to verify proper formatting of browser executable arguments and profile flags based on config rules.
+
 - [ ] T012 [P] [US1] Implement CLI logic in `src/cli/mod.rs` to accept a URL as a trailing argument and route it using the loaded config.
 - [ ] T013 [US1] Implement Debian/Ubuntu desktop file creation and `xdg-settings` call for Linux default browser registration in `src/os/default_browser.rs`.
 - [ ] T014 [P] [US1] Implement macOS default browser registration guidance/automation in `src/os/default_browser.rs`.
@@ -47,10 +52,14 @@
 
 - [ ] T020 [US3] Implement `src/extension/native_messaging.rs` to handle reading/writing length-prefixed JSON payloads on stdin/stdout.
 - [ ] T021 [P] [US3] Define JSON schema structs (`ResolvedUrl`, `Ack`, `Error`) in `src/extension/native_messaging.rs` using `serde` as specified in `contracts/native-messaging.md`.
+- [ ] T021a [P] [US3] Write unit tests in `src/extension/native_messaging.rs` for correct JSON serialization and deserialization of the Native Messaging protocol schemas.
+
 - [ ] T022 [US3] Implement the Native Messaging host loop in the `daemon` CLI command (`src/cli/mod.rs`), receiving URLs from the extension and dispatching them to the router.
 - [ ] T023 [US3] Implement `extension/manifest.json` with necessary permissions (`webNavigation`, `nativeMessaging`, `storage`) and host matching.
 - [ ] T024 [US3] Implement `extension/background.js` to monitor `webNavigation` events for configured redirect domains, capture the final URL, and send a Native Message to `com.antarcticite.router`.
 - [ ] T025 [P] [US3] Update `src/core/router.rs` to check if an incoming URL matches a `RedirectPolicy`; if so, open it in the default browser *without* profile flags and rely on the extension to report back.
+- [ ] T025a [US3] Implement a maximum redirect depth counter in `src/core/router.rs` for pending resolutions to prevent infinite redirect loops, triggering an OS notification if the limit is exceeded.
+
 
 ## Phase 6: Polish
 
