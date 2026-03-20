@@ -25,16 +25,16 @@
 **Goal**: As a user working with multiple clients, I want links to specific client domains to open in their designated browser profiles, so my client sessions remain separated.
 **Independent Test**: Configure a rule for a test domain, click a link to that domain, and verify it opens in the correct profile.
 
-- [ ] T009 [US1] Implement `src/core/router.rs` to accept a URL and a `Config` and return the matching `Rule` or `DefaultFallback`.
-- [ ] T010 [P] [US1] Write unit tests in `src/core/router.rs` for URL matching logic (exact domain match and regex/pattern match).
-- [ ] T011 [US1] Implement OS-specific browser launch logic (handling different browsers and profile flags) triggered by the router in `src/core/router.rs`.
-- [ ] T011a [P] [US1] Write unit tests in `src/core/router.rs` (or os module) to verify proper formatting of browser executable arguments and profile flags based on config rules.
+- [x] T009 [US1] Implement `src/core/router.rs` to accept a URL and a `Config` and return the matching `Rule` or `DefaultFallback`.
+- [x] T010 [P] [US1] Write unit tests in `src/core/router.rs` for URL matching logic (exact domain match and regex/pattern match).
+- [x] T011 [US1] Implement OS-specific browser launch logic (handling different browsers and profile flags) triggered by the router in `src/core/router.rs`.
+- [x] T011a [P] [US1] Write unit tests in `src/core/router.rs` (or os module) to verify proper formatting of browser executable arguments and profile flags based on config rules.
 
-- [ ] T012 [P] [US1] Implement CLI logic in `src/cli/mod.rs` to accept a URL as a trailing argument and route it using the loaded config.
-- [ ] T013 [US1] Implement Debian/Ubuntu desktop file creation and `xdg-settings` call for Linux default browser registration in `src/os/default_browser.rs`.
-- [ ] T014 [P] [US1] Implement macOS default browser registration guidance/automation in `src/os/default_browser.rs`.
-- [ ] T015 [P] [US1] Implement Windows default browser registry edits and Settings app launch in `src/os/default_browser.rs`.
-- [ ] T016 [US1] Connect the `install` CLI command to the `src/os/default_browser.rs` logic.
+- [x] T012 [P] [US1] Implement CLI logic in `src/cli/mod.rs` to accept a URL as a trailing argument and route it using the loaded config.
+- [x] T013 [US1] Implement Debian/Ubuntu desktop file creation and `xdg-settings` call for Linux default browser registration in `src/os/default_browser.rs`.
+- [x] T014 [P] [US1] Implement macOS default browser registration guidance/automation in `src/os/default_browser.rs`.
+- [x] T015 [P] [US1] Implement Windows default browser registry edits and Settings app launch in `src/os/default_browser.rs`.
+- [x] T016 [US1] Connect the `install` CLI command to the `src/os/default_browser.rs` logic.
 
 ## Phase 4: User Story 2 - Handling Unknown URLs
 
