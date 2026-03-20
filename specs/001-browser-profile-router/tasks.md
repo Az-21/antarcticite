@@ -12,13 +12,13 @@
 
 ## Phase 2: Foundational 
 
-- [ ] T005 Implement `src/core/logger.rs` to configure rolling plain-text logging using `tracing-appender` in the OS app data directory.
-- [ ] T006 Implement `src/core/config.rs` defining the `Config`, `Rule`, `DefaultFallback`, and `RedirectPolicy` structs matching `data-model.md` and implementing `serde` serialization.
-- [ ] T007 Implement function to load and parse the TOML configuration file from the standard OS configuration path in `src/core/config.rs`.
-- [ ] T007a [P] Write unit tests in `src/core/config.rs` for parsing valid and invalid TOML configurations to ensure robust deserialization.
-- [ ] T007b Implement caching mechanism in `src/core/config.rs` to store the last known good configuration in memory/disk and fallback to it (while triggering an OS notification via `src/os/notifications.rs`) if parsing the updated TOML file fails.
+- [x] T005 Implement `src/core/logger.rs` to configure rolling plain-text logging using `tracing-appender` in the OS app data directory.
+- [x] T006 Implement `src/core/config.rs` defining the `Config`, `Rule`, `DefaultFallback`, and `RedirectPolicy` structs matching `data-model.md` and implementing `serde` serialization.
+- [x] T007 Implement function to load and parse the TOML configuration file from the standard OS configuration path in `src/core/config.rs`.
+- [x] T007a [P] Write unit tests in `src/core/config.rs` for parsing valid and invalid TOML configurations to ensure robust deserialization.
+- [x] T007b Implement caching mechanism in `src/core/config.rs` to store the last known good configuration in memory/disk and fallback to it (while triggering an OS notification via `src/os/notifications.rs`) if parsing the updated TOML file fails.
 
-- [ ] T008 Implement `src/os/notifications.rs` to wrap `notify-rust` for displaying errors (e.g., config parsing errors) natively.
+- [x] T008 Implement `src/os/notifications.rs` to wrap `notify-rust` for displaying errors (e.g., config parsing errors) natively.
 
 ## Phase 3: User Story 1 - Basic URL Routing
 
