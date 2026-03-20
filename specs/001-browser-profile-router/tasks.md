@@ -50,15 +50,15 @@
 **Goal**: As an employee using corporate security tools like Mimecast, I want the app to allow the security check to complete and then route the final resolved URL to the correct client profile.
 **Independent Test**: Click a known Mimecast rewritten link, verify the security check happens, and check that the final resolved URL is subsequently routed to the appropriate target profile.
 
-- [ ] T020 [US3] Implement `src/extension/native_messaging.rs` to handle reading/writing length-prefixed JSON payloads on stdin/stdout.
-- [ ] T021 [P] [US3] Define JSON schema structs (`ResolvedUrl`, `Ack`, `Error`) in `src/extension/native_messaging.rs` using `serde` as specified in `contracts/native-messaging.md`.
-- [ ] T021a [P] [US3] Write unit tests in `src/extension/native_messaging.rs` for correct JSON serialization and deserialization of the Native Messaging protocol schemas.
+- [x] T020 [US3] Implement `src/extension/native_messaging.rs` to handle reading/writing length-prefixed JSON payloads on stdin/stdout.
+- [x] T021 [P] [US3] Define JSON schema structs (`ResolvedUrl`, `Ack`, `Error`) in `src/extension/native_messaging.rs` using `serde` as specified in `contracts/native-messaging.md`.
+- [x] T021a [P] [US3] Write unit tests in `src/extension/native_messaging.rs` for correct JSON serialization and deserialization of the Native Messaging protocol schemas.
 
-- [ ] T022 [US3] Implement the Native Messaging host loop in the `daemon` CLI command (`src/cli/mod.rs`), receiving URLs from the extension and dispatching them to the router.
-- [ ] T023 [US3] Implement `extension/manifest.json` with necessary permissions (`webNavigation`, `nativeMessaging`, `storage`) and host matching.
-- [ ] T024 [US3] Implement `extension/background.js` to monitor `webNavigation` events for configured redirect domains, capture the final URL, and send a Native Message to `com.antarcticite.router`.
-- [ ] T025 [P] [US3] Update `src/core/router.rs` to check if an incoming URL matches a `RedirectPolicy`; if so, open it in the default browser *without* profile flags and rely on the extension to report back.
-- [ ] T025a [US3] Implement a maximum redirect depth counter in `src/core/router.rs` for pending resolutions to prevent infinite redirect loops, triggering an OS notification if the limit is exceeded.
+- [x] T022 [US3] Implement the Native Messaging host loop in the `daemon` CLI command (`src/cli/mod.rs`), receiving URLs from the extension and dispatching them to the router.
+- [x] T023 [US3] Implement `extension/manifest.json` with necessary permissions (`webNavigation`, `nativeMessaging`, `storage`) and host matching.
+- [x] T024 [US3] Implement `extension/background.js` to monitor `webNavigation` events for configured redirect domains, capture the final URL, and send a Native Message to `com.antarcticite.router`.
+- [x] T025 [P] [US3] Update `src/core/router.rs` to check if an incoming URL matches a `RedirectPolicy`; if so, open it in the default browser *without* profile flags and rely on the extension to report back.
+- [x] T025a [US3] Implement a maximum redirect depth counter in `src/core/router.rs` for pending resolutions to prevent infinite redirect loops, triggering an OS notification if the limit is exceeded.
 
 
 ## Phase 6: Polish

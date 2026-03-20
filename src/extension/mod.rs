@@ -1,1 +1,1 @@
-// Extension module
+pub mod native_messaging;

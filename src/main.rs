@@ -5,6 +5,7 @@ pub mod os;
 
 use clap::Parser;
 use cli::{Cli, Commands};
+use extension::native_messaging::{read_message, write_message, ExtensionMessage, NativeMessage, AckData};
 use tracing::{error, info};
 
 #[tokio::main]
@@ -23,8 +24,44 @@ async fn main() -> anyhow::Result<()> {
 
     match &cli.command {
         Some(Commands::Daemon) => {
-            info!("Starting daemon...");
-            println!("Daemon mode not fully implemented yet.");
+            info!("Starting daemon/native messaging host...");
+            
+            // Loop reading from stdin
+            loop {
+                match read_message() {
+                    Ok(Some(ExtensionMessage::ResolvedUrl(data))) => {
+                        info!("Received resolved URL from extension: {}", data.resolved_url);
+                        
+                        // Load config and route the resolved URL
+                        let config = match core::config::load_config() {
+                            Ok(c) => c,
+                            Err(e) => {
+                                error!("Failed to load configuration: {}", e);
+                                continue;
+                            }
+                        };
+                        
+                        if let Err(e) = core::router::open_url(&data.resolved_url, &config) {
+                            error!("Failed to route resolved URL: {}", e);
+                        } else {
+                            // Acknowledge back to the extension
+                            let ack = NativeMessage::Ack(AckData {
+                                status: "success".to_string(),
+                                message: "URL routed successfully".to_string(),
+                            });
+                            let _ = write_message(&ack);
+                        }
+                    }
+                    Ok(None) => {
+                        info!("Extension disconnected. Exiting daemon.");
+                        break;
+                    }
+                    Err(e) => {
+                        error!("Error reading message from extension: {}", e);
+                        break;
+                    }
+                }
+            }
         }
         Some(Commands::Install) => {
             info!("Running installation...");

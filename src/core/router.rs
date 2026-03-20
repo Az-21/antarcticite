@@ -9,19 +9,56 @@ use std::time::{Duration, Instant};
 use tracing::{debug, error, info, warn};
 use url::Url;
 
+use crate::os::notifications::show_notification;
+
 pub enum RouteResult<'a> {
     Matched(&'a Rule),
     Fallback(&'a DefaultFallback),
+    PendingRedirect,
 }
 
 static DEBOUNCE_CACHE: Lazy<Mutex<HashMap<String, Instant>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 const DEBOUNCE_DURATION: Duration = Duration::from_millis(500);
+
+// Simple global tracking to prevent infinite redirect loops
+static REDIRECT_DEPTH: Lazy<Mutex<HashMap<String, u32>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+const MAX_REDIRECT_DEPTH: u32 = 5;
 
 /// Routes a URL string against a configuration, returning the matching rule or the default fallback.
 pub fn route_url<'a>(url_str: &str, config: &'a Config) -> Result<RouteResult<'a>> {
     let url = Url::parse(url_str).context("Failed to parse URL")?;
     let domain = url.host_str().unwrap_or("");
 
+    // 1. Check Redirect Policies (like Mimecast)
+    for policy in &config.redirect_policies {
+        if domain == policy.match_domain {
+            info!("Matched redirect policy for domain: {}", domain);
+            
+            // Check redirect depth to prevent infinite loops
+            let mut depth_map = REDIRECT_DEPTH.lock().unwrap();
+            let depth = depth_map.entry(domain.to_string()).or_insert(0);
+            *depth += 1;
+            
+            if *depth > MAX_REDIRECT_DEPTH {
+                let msg = format!("Exceeded maximum redirect depth ({}) for domain {}", MAX_REDIRECT_DEPTH, domain);
+                error!("{}", msg);
+                show_notification("Infinite Redirect Detected", &msg);
+                
+                // Reset depth and fallback to default rather than looping forever
+                *depth = 0;
+                return Ok(RouteResult::Fallback(&config.default));
+            }
+            
+            return Ok(RouteResult::PendingRedirect);
+        }
+    }
+
+    // Reset depth map for successful normal routes to prevent stale buildup
+    if let Ok(mut depth_map) = REDIRECT_DEPTH.lock() {
+        depth_map.clear();
+    }
+
+    // 2. Check Routing Rules
     for rule in &config.rules {
         // Exact domain match
         if let Some(match_domain) = &rule.match_domain {
@@ -172,6 +209,10 @@ pub fn open_url(url_str: &str, config: &Config) -> Result<()> {
         RouteResult::Matched(rule) => {
             info!("Matched rule mapping to browser '{}', profile '{:?}'", rule.target_browser, rule.target_profile);
             (rule.target_browser.as_str(), rule.target_profile.as_deref())
+        }
+        RouteResult::PendingRedirect => {
+            info!("URL requires resolution. Opening in default browser WITHOUT profile flags so extension can intercept.");
+            (config.default.browser.as_str(), None) // Force no profile for the redirect wrapper
         }
         RouteResult::Fallback(fallback) => {
             info!("Fell back to default browser '{}', profile '{:?}'", fallback.browser, fallback.profile);
