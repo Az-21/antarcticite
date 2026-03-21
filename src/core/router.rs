@@ -33,7 +33,10 @@ pub fn route_url<'a>(url_str: &str, config: &'a Config) -> Result<RouteResult<'a
     // 1. Check Redirect Policies (like Mimecast)
     for policy in &config.redirect_policies {
         if domain == policy.match_domain {
-            info!("Matched redirect policy for domain: {}", domain);
+            info!(
+                "LINK CLICK: {} matched redirect policy for domain: {}",
+                url_str, domain
+            );
 
             // Check redirect depth to prevent infinite loops
             let mut depth_map = REDIRECT_DEPTH.lock().unwrap();
@@ -63,12 +66,17 @@ pub fn route_url<'a>(url_str: &str, config: &'a Config) -> Result<RouteResult<'a
     }
 
     // 2. Check Routing Rules
-    for rule in &config.rules {
+    for (i, rule) in config.rules.iter().enumerate() {
         // Exact domain match
         if let Some(match_domain) = &rule.match_domain
             && domain == match_domain
         {
-            debug!("Matched exact domain: {}", match_domain);
+            info!(
+                "LINK CLICK: {} matched rule #{} (domain: {})",
+                url_str,
+                i + 1,
+                match_domain
+            );
             return Ok(RouteResult::Matched(rule));
         }
 
@@ -77,7 +85,12 @@ pub fn route_url<'a>(url_str: &str, config: &'a Config) -> Result<RouteResult<'a
             match Regex::new(match_pattern) {
                 Ok(re) => {
                     if re.is_match(url_str) {
-                        debug!("Matched regex pattern: {}", match_pattern);
+                        info!(
+                            "LINK CLICK: {} matched rule #{} (pattern: {})",
+                            url_str,
+                            i + 1,
+                            match_pattern
+                        );
                         return Ok(RouteResult::Matched(rule));
                     }
                 }
@@ -88,7 +101,7 @@ pub fn route_url<'a>(url_str: &str, config: &'a Config) -> Result<RouteResult<'a
         }
     }
 
-    debug!("No rule matched, using default fallback.");
+    info!("LINK CLICK: {} fell back to default browser", url_str);
     Ok(RouteResult::Fallback(&config.default))
 }
 
@@ -102,30 +115,45 @@ fn get_browser_command(browser: &str, profile: Option<&str>, url: &str) -> Comma
         let mut cmd = Command::new("open");
 
         // Translate some common application IDs or names for macOS
-        let app_name = match browser_lower.as_str() {
-            "chrome" | "com.google.chrome" | "google chrome" => "Google Chrome",
-            "edge" | "com.microsoft.edge" | "microsoft edge" => "Microsoft Edge",
-            "firefox" | "org.mozilla.firefox" => "Firefox",
-            "safari" | "com.apple.safari" => "Safari",
-            "brave" | "com.brave.browser" => "Brave Browser",
-            _ => browser, // Fallback to provided name
+        let (app_identifier, is_bundle_id) = match browser_lower.as_str() {
+            "chrome" | "com.google.chrome" | "google chrome" => ("Google Chrome", false),
+            "edge" | "com.microsoft.edge" | "microsoft edge" | "com.microsoft.edgemac" => {
+                ("Microsoft Edge", false)
+            }
+            "firefox" | "org.mozilla.firefox" => ("Firefox", false),
+            "safari" | "com.apple.safari" => ("Safari", false),
+            "brave" | "com.brave.browser" => ("Brave Browser", false),
+            _ => {
+                // If it looks like a bundle ID, treat it as one
+                if browser.contains('.') && !browser.contains(' ') {
+                    (browser, true)
+                } else {
+                    (browser, false)
+                }
+            }
         };
 
-        cmd.arg("-a").arg(app_name);
+        if is_bundle_id {
+            cmd.arg("-b").arg(app_identifier);
+        } else {
+            cmd.arg("-a").arg(app_identifier);
+        }
+
+        // Pass the URL to 'open' directly
+        cmd.arg(url);
 
         if let Some(p) = profile
             && !p.is_empty()
         {
             cmd.arg("--args");
             // Different browsers have different profile flags
-            if app_name == "Firefox" {
+            if app_identifier == "Firefox" {
                 cmd.arg("-P").arg(p);
             } else {
                 // Chromium based (Chrome, Edge, Brave)
                 cmd.arg(format!("--profile-directory={}", p));
             }
         }
-        cmd.arg(url);
         cmd
     }
 
@@ -335,7 +363,23 @@ mod tests {
             assert!(cmd_ff_str.contains("Firefox"));
             assert!(cmd_ff_str.contains("-P"));
             assert!(cmd_ff_str.contains("dev"));
+
+            let cmd_edge =
+                get_browser_command("com.microsoft.edgemac", None, "https://example.com");
+            let cmd_edge_str = format!("{:?}", cmd_edge);
+            assert!(cmd_edge_str.contains("-a"));
+            assert!(cmd_edge_str.contains("Microsoft Edge"));
+
+            let cmd_custom = get_bundle_id_command("com.custom.browser", "https://example.com");
+            let cmd_custom_str = format!("{:?}", cmd_custom);
+            assert!(cmd_custom_str.contains("-b"));
+            assert!(cmd_custom_str.contains("com.custom.browser"));
         }
+    }
+
+    #[cfg(target_os = "macos")]
+    fn get_bundle_id_command(id: &str, url: &str) -> Command {
+        get_browser_command(id, None, url)
     }
 
     #[test]

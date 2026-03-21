@@ -10,7 +10,7 @@ pub struct Cli {
     pub url: Option<String>,
 }
 
-#[derive(Subcommand)]
+#[derive(Debug, Subcommand)]
 pub enum Commands {
     /// Run the background routing daemon
     Daemon,

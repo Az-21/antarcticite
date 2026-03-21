@@ -160,6 +160,8 @@ fn install_macos() -> Result<()> {
     <string>Owner</string>
     <key>LSBackgroundOnly</key>
     <false/>
+    <key>LSFileQuarantineEnabled</key>
+    <false/>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

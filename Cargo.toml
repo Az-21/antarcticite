@@ -22,3 +22,4 @@ tracing-appender = "0.2.4"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter", "registry", "fmt", "std"] }
 tray-icon = "0.21.3"
 url = "2.5.8"
+tao = "0.31.1"

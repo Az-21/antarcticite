@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use directories::ProjectDirs;
+use directories::BaseDirs;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -53,13 +53,21 @@ pub struct Config {
 static LAST_GOOD_CONFIG: Lazy<RwLock<Option<Config>>> = Lazy::new(|| RwLock::new(None));
 
 pub fn get_config_path() -> Option<PathBuf> {
-    ProjectDirs::from("com", "antarcticite", "router")
-        .map(|dirs| dirs.config_dir().join("config.toml"))
+    BaseDirs::new().map(|dirs| {
+        dirs.home_dir()
+            .join(".config")
+            .join("antarcticite")
+            .join("config.toml")
+    })
 }
 
 pub fn get_backup_config_path() -> Option<PathBuf> {
-    ProjectDirs::from("com", "antarcticite", "router")
-        .map(|dirs| dirs.data_local_dir().join("config.backup.toml"))
+    BaseDirs::new().map(|dirs| {
+        dirs.home_dir()
+            .join(".config")
+            .join("antarcticite")
+            .join("config.backup.toml")
+    })
 }
 
 pub fn load_config() -> Result<Config> {
