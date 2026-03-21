@@ -65,11 +65,11 @@ pub fn route_url<'a>(url_str: &str, config: &'a Config) -> Result<RouteResult<'a
     // 2. Check Routing Rules
     for rule in &config.rules {
         // Exact domain match
-        if let Some(match_domain) = &rule.match_domain {
-            if domain == match_domain {
-                debug!("Matched exact domain: {}", match_domain);
-                return Ok(RouteResult::Matched(rule));
-            }
+        if let Some(match_domain) = &rule.match_domain
+            && domain == match_domain
+        {
+            debug!("Matched exact domain: {}", match_domain);
+            return Ok(RouteResult::Matched(rule));
         }
 
         // Pattern match
@@ -113,16 +113,16 @@ fn get_browser_command(browser: &str, profile: Option<&str>, url: &str) -> Comma
 
         cmd.arg("-a").arg(app_name);
 
-        if let Some(p) = profile {
-            if !p.is_empty() {
-                cmd.arg("--args");
-                // Different browsers have different profile flags
-                if app_name == "Firefox" {
-                    cmd.arg("-P").arg(p);
-                } else {
-                    // Chromium based (Chrome, Edge, Brave)
-                    cmd.arg(format!("--profile-directory={}", p));
-                }
+        if let Some(p) = profile
+            && !p.is_empty()
+        {
+            cmd.arg("--args");
+            // Different browsers have different profile flags
+            if app_name == "Firefox" {
+                cmd.arg("-P").arg(p);
+            } else {
+                // Chromium based (Chrome, Edge, Brave)
+                cmd.arg(format!("--profile-directory={}", p));
             }
         }
         cmd.arg(url);
@@ -196,11 +196,11 @@ pub fn open_url(url_str: &str, config: &Config) -> Result<()> {
         // Clean up old entries
         cache.retain(|_, time| now.duration_since(*time) < DEBOUNCE_DURATION);
 
-        if let Some(&last_time) = cache.get(url_str) {
-            if now.duration_since(last_time) < DEBOUNCE_DURATION {
-                info!("Debounced duplicate request for URL: {}", url_str);
-                return Ok(()); // Silently ignore duplicate clicks within 500ms
-            }
+        if let Some(&last_time) = cache.get(url_str)
+            && now.duration_since(last_time) < DEBOUNCE_DURATION
+        {
+            info!("Debounced duplicate request for URL: {}", url_str);
+            return Ok(()); // Silently ignore duplicate clicks within 500ms
         }
 
         cache.insert(url_str.to_string(), now);

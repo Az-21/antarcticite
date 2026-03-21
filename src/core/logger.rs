@@ -22,11 +22,24 @@ pub fn init() -> anyhow::Result<tracing_appender::non_blocking::WorkerGuard> {
 
     let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
 
-    // Initialize tracing subscriber
-    tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env().add_directive(tracing::Level::INFO.into()))
+    // Initialize tracing subscriber with both file and stdout
+    use tracing_subscriber::Layer;
+    use tracing_subscriber::layer::SubscriberExt;
+    use tracing_subscriber::util::SubscriberInitExt;
+
+    let file_layer = tracing_subscriber::fmt::layer()
         .with_writer(non_blocking)
-        .with_ansi(false) // Disable ANSI escapes in log file
+        .with_ansi(false)
+        .with_filter(EnvFilter::from_default_env().add_directive(tracing::Level::INFO.into()));
+
+    let stdout_layer = tracing_subscriber::fmt::layer()
+        .with_writer(std::io::stdout)
+        .with_ansi(true)
+        .with_filter(EnvFilter::from_default_env().add_directive(tracing::Level::INFO.into()));
+
+    tracing_subscriber::registry()
+        .with(file_layer)
+        .with(stdout_layer)
         .init();
 
     Ok(guard)

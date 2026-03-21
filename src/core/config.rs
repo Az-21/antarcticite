@@ -124,27 +124,25 @@ pub fn load_config() -> Result<Config> {
 
 fn fallback_to_last_good() -> Result<Config> {
     // Try memory cache first
-    if let Ok(cache) = LAST_GOOD_CONFIG.read() {
-        if let Some(config) = cache.as_ref() {
-            info!("Using in-memory cached configuration.");
-            return Ok(config.clone());
-        }
+    if let Ok(cache) = LAST_GOOD_CONFIG.read()
+        && let Some(config) = cache.as_ref()
+    {
+        info!("Using in-memory cached configuration.");
+        return Ok(config.clone());
     }
 
     // Try disk backup next
-    if let Some(backup_path) = get_backup_config_path() {
-        if backup_path.exists() {
-            if let Ok(content) = fs::read_to_string(&backup_path) {
-                if let Ok(config) = toml::from_str::<Config>(&content) {
-                    info!("Using on-disk backup configuration.");
-                    // Populate memory cache
-                    if let Ok(mut cache) = LAST_GOOD_CONFIG.write() {
-                        *cache = Some(config.clone());
-                    }
-                    return Ok(config);
-                }
-            }
+    if let Some(backup_path) = get_backup_config_path()
+        && backup_path.exists()
+        && let Ok(content) = fs::read_to_string(&backup_path)
+        && let Ok(config) = toml::from_str::<Config>(&content)
+    {
+        info!("Using on-disk backup configuration.");
+        // Populate memory cache
+        if let Ok(mut cache) = LAST_GOOD_CONFIG.write() {
+            *cache = Some(config.clone());
         }
+        return Ok(config);
     }
 
     Err(anyhow::anyhow!(
